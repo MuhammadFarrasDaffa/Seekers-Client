@@ -1,21 +1,32 @@
-// src/services/jobService.ts
 const API_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export const jobService = {
-  // Ambil semua lowongan
-  getAllJobs: async () => {
-    // Kita asumsikan endpoint public, kalau butuh token nanti kita tambah header Authorization
-    const res = await fetch(`${API_URL}/jobs`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      cache: "no-store", // Agar data selalu fresh (SSR/ISR)
-    });
+  // Update to support pagination & search
+  getAllJobs: async (
+    page: number = 1,
+    limit: number = 9,
+    search: string = "",
+  ) => {
+    try {
+      // Create query params
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+      });
 
-    if (!res.ok) {
-      const error: any = new Error("Gagal mengambil data lowongan");
-      error.status = res.status;
-      throw error;
+      if (search) params.append("search", search); // Assuming backend supports ?search=
+
+      const res = await fetch(`${API_URL}/jobs?${params.toString()}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+      });
+
+      if (!res.ok) throw new Error("Gagal mengambil data lowongan");
+      return await res.json();
+    } catch (error) {
+      console.error(error);
+      return { data: [], total: 0, hasMore: false };
     }
-    return await res.json();
   },
 };

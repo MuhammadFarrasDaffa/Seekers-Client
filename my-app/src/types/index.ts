@@ -165,8 +165,9 @@ export interface Job {
   title: string;
   company: string;
   companyLogo?: string;
+  lastUpdated?: string;
   location: string;
-  type: string; // e.g., "Full Time", "Remote"
+  jobType: string; // e.g., "Full Time", "Remote"
   experienceLevel: string; // e.g., "Junior", "Mid"
   minEducation?: string;
   salary?:
