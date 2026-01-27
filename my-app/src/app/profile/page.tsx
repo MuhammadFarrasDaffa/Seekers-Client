@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -158,19 +157,9 @@ const ProfileEditSection = () => {
                   Data pribadi dan kontak.
                 </p>
               </div>
-
-              <div className="flex justify-end mb-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => router.push("/payment/history")}
-                  className="bg-white/80 backdrop-blur border border-gray-200 shadow-sm hover:bg-gray-50"
-                >
-                  Payment History
-                </Button>
-              </div>
-
-              <div className="space-y-4">
+            </div>
+            <div className="grid grid-cols-1 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <Input
                   label="Nama Lengkap"
                   placeholder="Budi Santoso"
