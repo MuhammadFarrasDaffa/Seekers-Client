@@ -174,7 +174,7 @@ export default function Interview() {
 
       // Navigate dengan Next.js router setelah memastikan data tersimpan
       setTimeout(() => {
-        router.push("/interviews/room");
+        router.push("/interview/room");
       }, 100);
     } catch (error) {
       console.error("Error starting interview:", error);
