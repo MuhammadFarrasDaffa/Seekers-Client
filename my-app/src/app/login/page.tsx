@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-
 import { authService } from "@/services/authService";
 import PixelBlast from "@/components/ui/PixelBlast";
+// Import komponen logo baru
+import AuthLogo from "@/components/auth/AuthLogo";
+import { ArrowRight } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,28 +29,19 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
     try {
-      // Wiring ke Backend
       const response = await authService.login(
         formData.email,
         formData.password,
       );
-
-      console.log(response);
-
-      // Simpan Token
-      if (response) {
-        localStorage.setItem("token", response.access_token);
+      if (response.token) {
+        localStorage.setItem("token", response.token);
         localStorage.setItem("user", JSON.stringify(response.user));
       }
-
       toast.success("Login Berhasil!", {
         description: "Selamat datang kembali.",
       });
-
-      // Redirect
-      router.push("/dashboard");
+      // router.push("/dashboard"); // Uncomment jika sudah siap
     } catch (error: any) {
       toast.error("Login Gagal", { description: error.message });
     } finally {
@@ -58,12 +51,15 @@ export default function LoginPage() {
 
   return (
     <div className="w-full h-screen relative overflow-hidden flex items-center justify-center bg-black">
-      {/* LAYER 1: Background Animation (Full Screen) */}
+      {/* LAYER 0: LOGO DI POJOK KIRI ATAS */}
+      <AuthLogo />
+
+      {/* LAYER 1: Background Animation */}
       <div className="absolute inset-0 z-0">
         <PixelBlast
           variant="square"
           pixelSize={4}
-          color="#7588d7" // Warna Pixel Biru Ungu
+          color="#7588d7" // Biru/Ungu untuk Login
           patternScale={2}
           patternDensity={1}
           pixelSizeJitter={0}
@@ -78,99 +74,124 @@ export default function LoginPage() {
         />
       </div>
 
-      {/* LAYER 2: Centered Card Form */}
-      <div className="relative z-10 w-full max-w-[420px] p-4">
-        {/* Container Putih di tengah */}
-        <div className="w-full bg-white rounded-2xl shadow-2xl p-8 md:p-10">
-          {/* HEADER: Logo & Title */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900 mb-2">
-              Seekers.
-            </h1>
-            <p className="text-gray-500 text-sm">
-              Masuk untuk melanjutkan perjalanan karirmu.
+      {/* LAYER 2: HORIZONTAL CARD FORM */}
+      {/* Ubah max-w menjadi lebih lebar untuk layout horizontal */}
+      <div className="relative z-10 w-full max-w-4xl p-4">
+        {/* Card Container: Flex Column di Mobile, Flex Row di Desktop */}
+        <div className="w-full bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+          {/* SISI KIRI: Welcome Section & Branding */}
+          <div className="w-full md:w-5/12 bg-gray-50 p-8 md:p-10 flex flex-col justify-center border-b md:border-b-0 md:border-r border-gray-100">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight">
+              Kembali Menjelajahi <br /> Peluang Karir.
+            </h2>
+            <p className="text-gray-600 text-sm leading-relaxed mb-6">
+              Masuk untuk mengakses dashboard personalmu dan temukan pekerjaan
+              yang cocok dengan skill AI-mu.
             </p>
+            {/* Hiasan visual kecil */}
+            <div className="flex items-center gap-2 text-sm font-semibold text-blue-600">
+              <span>Mulai Sekarang</span>
+              <ArrowRight className="w-4 h-4" />
+            </div>
           </div>
 
-          {/* FORM AREA */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="nama@email.com"
-                value={formData.email}
-                onChange={handleChange}
-                className="bg-gray-50 border-gray-200 focus:bg-white transition-all"
-              />
+          {/* SISI KANAN: Form Section */}
+          <div className="w-full md:w-7/12 p-8 md:p-10">
+            <div className="mb-6">
+              <h1 className="text-xl font-bold text-gray-900">Masuk ke Akun</h1>
+              <p className="text-sm text-gray-500">
+                Masukkan detail login Anda di bawah ini.
+              </p>
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <Link
-                  href="#"
-                  className="text-xs text-blue-600 hover:underline"
-                >
-                  Lupa password?
-                </Link>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-gray-700">
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="nama@email.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  // Style input sedikit lebih bersih
+                  className="h-11 bg-white border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all"
+                />
               </div>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={handleChange}
-                className="bg-gray-50 border-gray-200 focus:bg-white transition-all"
-              />
-            </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-gray-700">
+                    Password
+                  </Label>
+                  <Link
+                    href="#"
+                    className="text-xs font-medium text-blue-600 hover:underline"
+                  >
+                    Lupa password?
+                  </Link>
+                </div>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="h-11 bg-white border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all"
+                />
+              </div>
 
-            <Button
-              type="submit"
-              className="w-full bg-black hover:bg-gray-800 text-white font-semibold py-5"
-              disabled={isLoading}
-            >
-              {isLoading ? "Memproses..." : "Masuk"}
-            </Button>
-          </form>
-
-          {/* SEPARATOR */}
-          <div className="flex items-center gap-4 my-6">
-            <Separator className="flex-1" />
-            <span className="text-xs text-gray-400 font-medium">ATAU</span>
-            <Separator className="flex-1" />
-          </div>
-
-          {/* SOCIAL LOGIN */}
-          <Button variant="outline" className="w-full py-5" type="button">
-            Masuk dengan Google
-          </Button>
-
-          {/* FOOTER */}
-          <div className="mt-8 text-center">
-            <p className="text-sm text-gray-600">
-              Belum punya akun?{" "}
-              <Link
-                href="/register"
-                className="font-bold text-blue-600 hover:underline"
+              <Button
+                type="submit"
+                className="w-full h-11 bg-black hover:bg-gray-900 text-white font-semibold text-md mt-2"
+                disabled={isLoading}
               >
-                Daftar Gratis
-              </Link>
-            </p>
+                {isLoading ? "Memproses..." : "Masuk"}
+              </Button>
+            </form>
 
-            <div className="mt-6 pt-6 border-t border-gray-100">
-              <p className="text-[11px] text-gray-400 leading-tight">
-                Dengan masuk, kamu setuju dengan{" "}
-                <Link href="#" className="underline text-gray-600">
-                  Ketentuan
-                </Link>{" "}
-                &{" "}
-                <Link href="#" className="underline text-gray-600">
-                  Privasi
-                </Link>{" "}
-                kami.
+            {/* SEPARATOR & SOCIAL */}
+            <div className="flex items-center gap-4 my-6">
+              <Separator className="flex-1" />
+              <span className="text-xs text-gray-400 font-medium">ATAU</span>
+              <Separator className="flex-1" />
+            </div>
+            <Button
+              variant="outline"
+              className="w-full h-11 font-medium"
+              type="button"
+            >
+              {/* Ikon Google sederhana */}
+              <svg
+                className="mr-2 h-4 w-4"
+                aria-hidden="true"
+                focusable="false"
+                data-prefix="fab"
+                data-icon="google"
+                role="img"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 488 512"
+              >
+                <path
+                  fill="currentColor"
+                  d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
+                ></path>
+              </svg>
+              Masuk dengan Google
+            </Button>
+
+            {/* FOOTER LINK */}
+            <div className="mt-8 text-center md:text-left">
+              <p className="text-sm text-gray-600">
+                Belum punya akun?{" "}
+                <Link
+                  href="/register"
+                  className="font-bold text-blue-600 hover:underline"
+                >
+                  Daftar Gratis
+                </Link>
               </p>
             </div>
           </div>
