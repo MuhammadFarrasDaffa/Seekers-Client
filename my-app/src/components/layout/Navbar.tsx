@@ -57,7 +57,7 @@ export default function Navbar() {
   ];
 
   const privateNavItems = [
-    { name: "CV Generator", href: "/cv-generator", icon: FileText },
+    { name: "CV Generator", href: "/preview", icon: FileText },
     { name: "AI Interview", href: "/interview", icon: Mic },
   ];
 
