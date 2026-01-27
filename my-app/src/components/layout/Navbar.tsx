@@ -52,12 +52,12 @@ export default function Navbar() {
   }, []);
 
   const publicNavItems = [
-    { name: "Home", href: "/dashboard", icon: Home }, // Arahkan ke / untuk umum
-    { name: "List Job", href: "/jobs", icon: Briefcase }, // Alias dashboard
+    { name: "Beranda", href: "/dashboard", icon: Home }, // Arahkan ke / untuk umum
+    { name: "Loker", href: "/jobs", icon: Briefcase }, // Alias dashboard
   ];
 
   const privateNavItems = [
-    { name: "CV Generator", href: "/cv-generator", icon: FileText },
+    { name: "CV Generator", href: "/preview", icon: FileText },
     { name: "AI Interview", href: "/interview", icon: Mic },
   ];
 
@@ -100,7 +100,7 @@ export default function Navbar() {
             </svg>
           </div>
           <span className="text-xl font-bold tracking-tight text-gray-900">
-            Talentix<span className="text-emerald-500">.</span>
+            Seekers<span className="text-blue-500">.</span>
           </span>
         </Link>
 

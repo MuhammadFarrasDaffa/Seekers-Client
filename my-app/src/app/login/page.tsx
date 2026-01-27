@@ -10,9 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { authService } from "@/services/authService";
 import PixelBlast from "@/components/ui/PixelBlast";
-// Import komponen logo baru
+
 import AuthLogo from "@/components/auth/AuthLogo";
-import { ArrowRight } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
