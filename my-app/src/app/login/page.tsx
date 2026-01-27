@@ -35,9 +35,11 @@ export default function LoginPage() {
         formData.password,
       );
 
+      console.log(response);
+
       // Simpan Token
-      if (response.token) {
-        localStorage.setItem("token", response.token);
+      if (response) {
+        localStorage.setItem("token", response.access_token);
         localStorage.setItem("user", JSON.stringify(response.user));
       }
 
