@@ -75,14 +75,6 @@ export interface InterviewEvaluation {
   recommendations: string[];
 }
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  status?: string;
-}
-
 export interface LoginCredentials {
   email: string;
   password: string;
@@ -190,8 +182,9 @@ export interface Job {
 }
 
 export interface User {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   role: string;
+  token: number;
 }
