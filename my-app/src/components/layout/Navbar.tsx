@@ -164,6 +164,12 @@ export default function Navbar() {
                     <span>Profile</span>
                   </DropdownMenuItem>
                 </Link>
+                <Link href="/payment">
+                  <DropdownMenuItem className="cursor-pointer">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Billing</span>
+                  </DropdownMenuItem>
+                </Link>
                 <DropdownMenuItem className="cursor-pointer">
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Settings</span>

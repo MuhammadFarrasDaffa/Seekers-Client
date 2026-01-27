@@ -234,6 +234,17 @@ export default function ProfilePage() {
                 </h2>
               </div>
 
+              <div className="flex justify-end mb-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => router.push("/payment/history")}
+                  className="bg-white/80 backdrop-blur border border-gray-200 shadow-sm hover:bg-gray-50"
+                >
+                  Payment History
+                </Button>
+              </div>
+
               <div className="space-y-4">
                 <Input
                   label="Nama Lengkap"
