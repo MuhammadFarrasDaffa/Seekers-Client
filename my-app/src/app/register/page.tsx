@@ -54,7 +54,7 @@ export default function RegisterPage() {
         <PixelBlast
           variant="square"
           pixelSize={4}
-          color="#10b981" // Hijau Emerald
+          color="#7588d7" // Ungu/Biru
           patternScale={2}
           patternDensity={1}
           pixelSizeJitter={0}
@@ -84,28 +84,30 @@ export default function RegisterPage() {
             {/* Feature list kecil */}
             <ul className="space-y-2 text-sm text-gray-500 mb-6">
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Analisis
-                CV dengan AI
+                <CheckCircle2 className="w-4 h-4 text-blue-600" /> Analisis CV
+                dengan AI
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" />{" "}
-                Rekomendasi Job Akurat
+                <CheckCircle2 className="w-4 h-4 text-blue-600" /> Rekomendasi
+                Job Akurat
               </li>
             </ul>
-            <div className="flex items-center gap-2 text-sm font-semibold text-emerald-600">
-              <span>Gabung Seekers</span>
-              <ArrowRight className="w-4 h-4" />
-            </div>
           </div>
 
           {/* SISI KANAN: Form Section */}
           <div className="w-full md:w-7/12 p-8 md:p-10">
-            <div className="mb-6">
+            <div className="mb-8 text-center md:text-middle">
               <h1 className="text-xl font-bold text-gray-900">
                 Buat Akun Baru
               </h1>
-              <p className="text-sm text-gray-500">
-                Lengkapi data diri Anda untuk mendaftar.
+              <p className="text-sm text-gray-600">
+                Sudah punya akun?{" "}
+                <Link
+                  href="/login"
+                  className="font-bold text-blue-600 hover:underline"
+                >
+                  Login disini
+                </Link>
               </p>
             </div>
 
@@ -120,7 +122,7 @@ export default function RegisterPage() {
                   placeholder="John Doe"
                   value={formData.name}
                   onChange={handleChange}
-                  className="h-11 bg-white border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all"
+                  className="h-11 bg-white border-gray-200 focus:border-blue-600 focus:ring-blue-600/20 transition-all"
                 />
               </div>
               <div className="space-y-2">
@@ -134,7 +136,7 @@ export default function RegisterPage() {
                   placeholder="nama@email.com"
                   value={formData.email}
                   onChange={handleChange}
-                  className="h-11 bg-white border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all"
+                  className="h-11 bg-white border-gray-200 focus:border-blue-600 focus:ring-blue-600/20 transition-all"
                 />
               </div>
               <div className="space-y-2">
@@ -148,14 +150,14 @@ export default function RegisterPage() {
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={handleChange}
-                  className="h-11 bg-white border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all"
+                  className="h-11 bg-white border-gray-200 focus:border-blue-600 focus:ring-blue-600/20 transition-all"
                 />
               </div>
 
               <Button
                 type="submit"
-                // Gunakan warna emerald untuk tombol register
-                className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-md mt-2"
+                // Gunakan warna biru untuk tombol register
+                className="w-full h-11 bg-black hover:bg-gray-900 text-white font-semibold text-md mt-2 cursor-pointer"
                 disabled={isLoading}
               >
                 {isLoading ? "Membuat Akun..." : "Daftar Sekarang"}
@@ -192,23 +194,20 @@ export default function RegisterPage() {
             </Button>
 
             {/* FOOTER LINK */}
-            <div className="mt-8 text-center md:text-left">
-              <p className="text-sm text-gray-600">
-                Sudah punya akun?{" "}
-                <Link
-                  href="/login"
-                  className="font-bold text-emerald-600 hover:underline"
-                >
-                  Login disini
-                </Link>
-              </p>
+            <div className="mt-8 text-center md:text-middle">
               <p className="text-[11px] text-gray-400 leading-tight mt-4">
                 Dengan mendaftar, kamu setuju dengan{" "}
-                <Link href="#" className="underline hover:text-gray-600">
+                <Link
+                  href="#"
+                  className="underline text-blue-600 hover:text-blue-700"
+                >
                   Ketentuan
                 </Link>{" "}
                 &{" "}
-                <Link href="#" className="underline hover:text-gray-600">
+                <Link
+                  href="#"
+                  className="underline text-blue-600 hover:text-blue-700"
+                >
                   Privasi
                 </Link>{" "}
                 kami.

@@ -34,14 +34,16 @@ export default function LoginPage() {
         formData.email,
         formData.password,
       );
-      if (response.token) {
-        localStorage.setItem("token", response.token);
+      // console.log(response);
+
+      if (response) {
+        localStorage.setItem("token", response.access_token);
         localStorage.setItem("user", JSON.stringify(response.user));
       }
       toast.success("Login Berhasil!", {
         description: "Selamat datang kembali.",
       });
-      // router.push("/dashboard"); // Uncomment jika sudah siap
+      router.push("/dashboard");
     } catch (error: any) {
       toast.error("Login Gagal", { description: error.message });
     } finally {
@@ -88,16 +90,11 @@ export default function LoginPage() {
               Masuk untuk mengakses dashboard personalmu dan temukan pekerjaan
               yang cocok dengan skill AI-mu.
             </p>
-            {/* Hiasan visual kecil */}
-            <div className="flex items-center gap-2 text-sm font-semibold text-blue-600">
-              <span>Mulai Sekarang</span>
-              <ArrowRight className="w-4 h-4" />
-            </div>
           </div>
 
           {/* SISI KANAN: Form Section */}
           <div className="w-full md:w-7/12 p-8 md:p-10">
-            <div className="mb-6">
+            <div className="mb-6 text-center md:text-middle">
               <h1 className="text-xl font-bold text-gray-900">Masuk ke Akun</h1>
               <p className="text-sm text-gray-500">
                 Masukkan detail login Anda di bawah ini.
@@ -145,7 +142,7 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                className="w-full h-11 bg-black hover:bg-gray-900 text-white font-semibold text-md mt-2"
+                className="w-full h-11 bg-black hover:bg-gray-900 text-white font-semibold text-md mt-2 cursor-pointer"
                 disabled={isLoading}
               >
                 {isLoading ? "Memproses..." : "Masuk"}
@@ -183,7 +180,7 @@ export default function LoginPage() {
             </Button>
 
             {/* FOOTER LINK */}
-            <div className="mt-8 text-center md:text-left">
+            <div className="mt-8 text-center md:text-middle">
               <p className="text-sm text-gray-600">
                 Belum punya akun?{" "}
                 <Link
