@@ -63,11 +63,8 @@ export default function PaymentSuccessPage() {
             features.
           </p>
           <div className="flex flex-col gap-2">
-            <Button
-              onClick={() => router.push("/dashboard")}
-              className="w-full"
-            >
-              Go to Dashboard
+            <Button onClick={() => router.push("/profile")} className="w-full">
+              Go to Profile
             </Button>
             <Button
               onClick={() => router.push("/payment")}

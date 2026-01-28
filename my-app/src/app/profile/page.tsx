@@ -39,6 +39,7 @@ import {
 import type { ProfileFormData, Experience, Education } from "@/types/index";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { toast } from "sonner";
 
 // --- COMPONENT: FORM EDIT PROFILE + UPLOAD CV ---
 const ProfileEditSection = ({
@@ -679,17 +680,38 @@ interface Payment {
   tokenAmount: number;
   price: number;
   status: string;
+  snapToken?: string;
   createdAt: string;
+}
+
+declare global {
+  interface Window {
+    snap: any;
+  }
 }
 
 const PaymentHistorySection = () => {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [processingPayment, setProcessingPayment] = useState<string | null>(
+    null,
+  );
   const router = useRouter();
 
   useEffect(() => {
     loadPaymentHistory();
+    loadMidtransScript();
   }, []);
+
+  const loadMidtransScript = () => {
+    const script = document.createElement("script");
+    script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
+    script.setAttribute(
+      "data-client-key",
+      process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || "",
+    );
+    document.body.appendChild(script);
+  };
 
   const loadPaymentHistory = async () => {
     try {
@@ -752,6 +774,48 @@ const PaymentHistorySection = () => {
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  const handleContinuePayment = async (payment: Payment) => {
+    if (!payment.snapToken) {
+      toast.error("Token pembayaran tidak tersedia");
+      return;
+    }
+
+    try {
+      setProcessingPayment(payment._id);
+
+      // Open Midtrans Snap popup with existing snapToken
+      if (window.snap) {
+        window.snap.pay(payment.snapToken, {
+          onSuccess: async function (result: any) {
+            toast.success("Pembayaran berhasil!");
+            // Reload payment history to get updated status
+            await loadPaymentHistory();
+            // Trigger storage event to update token balance
+            window.dispatchEvent(new Event("storage"));
+          },
+          onPending: function (result: any) {
+            toast.info("Menunggu pembayaran...");
+            loadPaymentHistory();
+          },
+          onError: function (result: any) {
+            toast.error("Pembayaran gagal!");
+            loadPaymentHistory();
+          },
+          onClose: function () {
+            setProcessingPayment(null);
+          },
+        });
+      } else {
+        toast.error("Payment gateway belum siap. Silakan refresh halaman.");
+      }
+    } catch (error) {
+      toast.error("Terjadi kesalahan saat membuka pembayaran");
+      console.error("Error opening payment:", error);
+    } finally {
+      setTimeout(() => setProcessingPayment(null), 1000);
+    }
   };
 
   if (loading) {
@@ -848,6 +912,45 @@ const PaymentHistorySection = () => {
                 </div>
               </div>
             </div>
+
+            {/* Action button untuk pending payment */}
+            {payment.status === "pending" && payment.snapToken && (
+              <div className="flex items-center">
+                <Button
+                  onClick={() => handleContinuePayment(payment)}
+                  disabled={processingPayment === payment._id}
+                  className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                >
+                  {processingPayment === payment._id ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Loading...
+                    </>
+                  ) : (
+                    <>
+                      <Receipt className="w-4 h-4 mr-2" />
+                      Bayar Sekarang
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
+
+            {/* Info untuk expired payment */}
+            {payment.status === "expired" && (
+              <div className="flex flex-col items-end gap-2">
+                <p className="text-sm text-gray-500 italic">
+                  Transaksi telah hangus
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => router.push("/payment")}
+                >
+                  Buat Pesanan Baru
+                </Button>
+              </div>
+            )}
           </div>
         </Card>
       ))}

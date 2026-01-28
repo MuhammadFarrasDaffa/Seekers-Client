@@ -32,7 +32,6 @@ export default function PaymentFinishPage() {
           transactionStatus === "capture" ||
           transactionStatus === "settlement"
         ) {
-          toast.success("Payment successful!");
           router.replace("/payment/success");
         } else if (transactionStatus === "pending") {
           toast.info("Waiting for payment...");

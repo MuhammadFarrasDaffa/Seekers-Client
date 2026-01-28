@@ -132,9 +132,6 @@ export default function PaymentPage() {
             toast.error("Payment failed!");
             router.push("/payment/error");
           },
-          onClose: function () {
-            toast.info("Payment cancelled");
-          },
         });
       } else {
         toast.error("Payment gateway not loaded");
@@ -235,7 +232,7 @@ export default function PaymentPage() {
             </CardContent>
             <CardFooter>
               <Button
-                onClick={() => handlePayment(pkg.type)}
+                onClick={() => handlePayment(pkg.type.toLowerCase())}
                 disabled={processingPayment}
                 className="w-full"
                 variant={pkg.popular ? "default" : "outline"}
