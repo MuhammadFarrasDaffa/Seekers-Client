@@ -99,19 +99,19 @@ export default function InterviewSetupPage() {
       value: "junior" as const,
       title: "Junior",
       description: "0-2 tahun pengalaman",
-      color: "bg-emerald-100 text-emerald-700 border-emerald-200",
+      color: "bg-emerald-100 text-emerald-700 border-emerald-400",
     },
     {
       value: "middle" as const,
       title: "Middle",
       description: "2-5 tahun pengalaman",
-      color: "bg-blue-100 text-blue-700 border-blue-200",
+      color: "bg-blue-100 text-blue-700 border-blue-400",
     },
     {
       value: "senior" as const,
       title: "Senior",
       description: "5+ tahun pengalaman",
-      color: "bg-purple-100 text-purple-700 border-purple-200",
+      color: "bg-purple-100 text-purple-700 border-purple-400",
     },
   ];
 
@@ -130,9 +130,7 @@ export default function InterviewSetupPage() {
       categoryId: selectedCategory._id,
       categoryTitle: selectedCategory.title,
       level: selectedLevel,
-      tier: selectedTierData.title.toLowerCase().includes("free")
-        ? "free"
-        : "premium",
+      tier: selectedTierData.title,
       tokenUsage: selectedTierData.price,
     };
 
@@ -274,7 +272,7 @@ export default function InterviewSetupPage() {
                       onClick={() => setSelectedCategory(category)}
                       className={`relative p-4 rounded-xl border text-left transition-all ${
                         selectedCategory?._id === category._id
-                          ? "border-blue-600 bg-blue-50 ring-1 ring-blue-600"
+                          ? "border-blue-500 bg-blue-50 ring-1 ring-blue-500"
                           : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
                       }`}
                     >
@@ -317,7 +315,7 @@ export default function InterviewSetupPage() {
                     disabled={!selectedCategory || !isLevelEnabled(level.value)}
                     className={`p-4 rounded-xl border text-left transition-all ${
                       selectedLevel === level.value
-                        ? `border-blue-600 ring-1 ring-blue-600 ${level.color}` // Active Style
+                        ? `${level.color}` // Active Style
                         : "border-gray-200 bg-white hover:border-gray-300"
                     } ${!selectedCategory || !isLevelEnabled(level.value) ? "opacity-40 cursor-not-allowed" : ""}`}
                   >
@@ -495,6 +493,24 @@ export default function InterviewSetupPage() {
                 <ShieldCheck className="w-4 h-4 mt-0.5 shrink-0" />
                 <p>Dilarang refresh halaman saat interview berlangsung.</p>
               </div>
+              <div className="flex gap-2">
+                <ShieldCheck className="w-4 h-4 mt-0.5 shrink-0" />
+                <p>
+                  Interview ini akan mengurangi{" "}
+                  <strong>
+                    {tiers.find((t) => t._id === selectedTier)?.price ?? 0}{" "}
+                    token
+                  </strong>{" "}
+                  dari saldo Anda.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <ShieldCheck className="w-4 h-4 mt-0.5 shrink-0" />
+                <p>
+                  Jika sudah memulai proses interview, Anda{" "}
+                  <strong>tidak bisa kembali</strong> ke halaman setup.
+                </p>
+              </div>
             </div>
 
             <div className="flex gap-3">
@@ -506,7 +522,7 @@ export default function InterviewSetupPage() {
                 Batal
               </Button>
               <Button
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                className="flex-1 bg-black hover:bg-gray-800 text-white"
                 onClick={handleStartInterview}
                 disabled={loading}
               >

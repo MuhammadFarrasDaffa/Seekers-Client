@@ -1,5 +1,9 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Mic, Square, RotateCcw, Send, Loader2 } from "lucide-react";
+
 interface RecordingControlsProps {
   audioURL: string;
   isRecording: boolean;
@@ -20,73 +24,83 @@ export function RecordingControls({
   onReRecord,
 }: RecordingControlsProps) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t px-6 py-4 shadow-lg">
-      <div className="max-w-4xl mx-auto">
+    <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-gray-200 px-6 py-5">
+      <div className="container mx-auto max-w-3xl">
+        {/* Audio Preview */}
         {audioURL && (
-          <div className="mb-3 bg-gray-50 rounded-lg p-3 border">
-            <p className="text-xs font-medium text-gray-600 mb-2">
-              Preview your answer:
+          <Card className="mb-4 p-4 bg-gray-50 border border-gray-200">
+            <p className="text-sm font-medium text-gray-700 mb-2">
+              Preview jawaban Anda:
             </p>
-            <audio src={audioURL} controls className="w-full h-8" />
-          </div>
+            <audio src={audioURL} controls className="w-full h-10" />
+          </Card>
         )}
 
+        {/* Recording Indicator */}
         {isRecording && (
-          <div className="mb-3 flex items-center justify-center gap-2 text-red-500">
-            <span className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
-            <span className="text-sm font-medium">
-              Recording in progress...
+          <div className="mb-4 flex items-center justify-center gap-3">
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+            </span>
+            <span className="text-sm font-medium text-red-600">
+              Merekam jawaban Anda...
             </span>
           </div>
         )}
 
-        <div className="flex items-center justify-center gap-3">
+        {/* Control Buttons */}
+        <div className="flex items-center justify-center gap-4">
+          {/* Start Recording */}
           {!isRecording && !audioURL && (
-            <button
+            <Button
               onClick={onStartRecording}
-              className="flex items-center gap-2 px-8 py-3 bg-red-500 text-white rounded-full hover:bg-red-600 transition font-medium shadow-lg hover:shadow-xl"
+              className="h-14 px-8 bg-black hover:bg-gray-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all"
             >
-              <span className="text-xl">🎤</span>
-              <span>Start Recording</span>
-            </button>
+              <Mic className="w-5 h-5 mr-2" />
+              Mulai Rekam Jawaban
+            </Button>
           )}
 
+          {/* Stop Recording */}
           {isRecording && (
-            <button
+            <Button
               onClick={onStopRecording}
-              className="flex items-center gap-2 px-8 py-3 bg-gray-600 text-white rounded-full hover:bg-gray-700 transition font-medium shadow-lg"
+              className="h-14 px-8 bg-gray-700 hover:bg-gray-800 text-white font-semibold rounded-xl shadow-lg transition-all"
             >
-              <span className="text-xl">⏹️</span>
-              <span>Stop Recording</span>
-            </button>
+              <Square className="w-5 h-5 mr-2" />
+              Berhenti Merekam
+            </Button>
           )}
 
+          {/* Re-record & Submit */}
           {audioURL && !isRecording && (
             <>
-              <button
+              <Button
                 onClick={onReRecord}
-                className="flex items-center gap-2 px-6 py-3 bg-yellow-500 text-white rounded-full hover:bg-yellow-600 transition font-medium shadow-lg"
+                variant="outline"
+                className="h-14 px-6 border-2 border-gray-300 hover:border-gray-400 font-semibold rounded-xl transition-all"
               >
-                <span className="text-xl">🔄</span>
-                <span>Re-record</span>
-              </button>
-              <button
+                <RotateCcw className="w-5 h-5 mr-2" />
+                Rekam Ulang
+              </Button>
+              <Button
                 onClick={onSubmitAnswer}
                 disabled={isSubmitting}
-                className="flex items-center gap-2 px-8 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-14 px-8 bg-black hover:bg-gray-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <>
-                    <span className="text-xl">⏳</span>
-                    <span>Processing...</span>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Memproses...
                   </>
                 ) : (
                   <>
-                    <span className="text-xl">📤</span>
-                    <span>Submit Answer</span>
+                    <Send className="w-5 h-5 mr-2" />
+                    Kirim Jawaban
                   </>
                 )}
-              </button>
+              </Button>
             </>
           )}
         </div>

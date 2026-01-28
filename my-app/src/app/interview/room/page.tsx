@@ -8,10 +8,14 @@ import {
 } from "@/types";
 import { useEffect, useState, useRef } from "react";
 import { useRecorder } from "./hooks/useRecorder";
-import { ChatThread } from "./components/ChatThread";
+import { QuestionCard } from "./components/QuestionCard";
 import { RecordingControls } from "./components/RecordingControls";
 import { CompletionCard } from "./components/CompletionCard";
 import { InterviewHeader } from "./components/InterviewHeader";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Mic, Play } from "lucide-react";
+import { useModal } from "@/components/ui/modal";
 import {
   requestAcknowledgment,
   requestFollowUp,
@@ -47,6 +51,14 @@ export default function Room() {
   const [showGreeting, setShowGreeting] = useState(true);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const [audioBlocked, setAudioBlocked] = useState(false);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const [showStartModal, setShowStartModal] = useState(true);
+  const [lastTranscription, setLastTranscription] = useState<string | null>(
+    null,
+  );
+
+  // Modal hook untuk mengganti browser alerts
+  const { modal, showAlert, showConfirm, closeModal, Modal } = useModal();
 
   const {
     isRecording,
@@ -57,7 +69,6 @@ export default function Room() {
     resetRecording,
     getAudioBlob,
   } = useRecorder();
-  const chatEndRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const currentQuestion = questions[currentQuestionIndex];
@@ -152,16 +163,20 @@ export default function Room() {
       // Push state kembali untuk mencegah back
       window.history.pushState(null, "", window.location.href);
 
-      // Tampilkan konfirmasi
-      const shouldLeave = window.confirm(
+      // Tampilkan konfirmasi menggunakan modal
+      showConfirm(
+        "Konfirmasi Keluar",
         "Apakah Anda yakin ingin meninggalkan interview? Progress Anda akan hilang.",
+        () => {
+          // Clear sessionStorage dan redirect ke halaman interviews
+          sessionStorage.removeItem("interviewData");
+          window.location.href = "/interview";
+        },
+        {
+          confirmText: "Ya, Keluar",
+          cancelText: "Tetap di Interview",
+        },
       );
-
-      if (shouldLeave) {
-        // Clear sessionStorage dan redirect ke halaman interviews
-        sessionStorage.removeItem("interviewData");
-        window.location.href = "/interview";
-      }
     };
 
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -181,16 +196,10 @@ export default function Room() {
     };
   }, [interviewCompleted]);
 
-  // Auto scroll to bottom when new message appears
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [currentQuestionIndex, answers, showGreeting]);
-
   // Auto play audio when question changes or follow-up appears
   useEffect(() => {
-    // Biarkan Greeting mencoba jalan tanpa interaksi (beberapa browser mengizinkan jika volume pelan/muted)
-    // Tapi pertanyaan selanjutnya butuh interaksi.
-    if (!hasUserInteracted && !showGreeting) {
+    // Only play audio after user has clicked "Mulai Interview" button
+    if (!hasUserInteracted) {
       return;
     }
 
@@ -206,9 +215,13 @@ export default function Room() {
       activeAudio = audio;
       audioRef.current = audio;
 
-      if (onEndedCallback) {
-        audio.onended = onEndedCallback;
-      }
+      // Set audio playing state
+      audio.onplay = () => setIsAudioPlaying(true);
+      audio.onended = () => {
+        setIsAudioPlaying(false);
+        if (onEndedCallback) onEndedCallback();
+      };
+      audio.onpause = () => setIsAudioPlaying(false);
 
       try {
         await audio.play();
@@ -217,6 +230,7 @@ export default function Room() {
         if ((error as Error).name !== "AbortError") {
           console.error("Playback failed:", error);
           setAudioBlocked(true);
+          setIsAudioPlaying(false);
         }
       }
     };
@@ -293,7 +307,7 @@ export default function Room() {
 
   const submitAnswer = async () => {
     if (!audioURL) {
-      alert("Tidak ada recording untuk dikirim");
+      showAlert("Peringatan", "Tidak ada recording untuk dikirim", "warning");
       return;
     }
 
@@ -305,11 +319,24 @@ export default function Room() {
 
       const audioBlob = getAudioBlob();
       if (!audioBlob) {
-        alert("Tidak ada recording untuk dikirim");
+        showAlert("Peringatan", "Tidak ada recording untuk dikirim", "warning");
         return;
       }
+
+      // Determine file extension based on MIME type
+      const mimeType = audioBlob.type;
+      let extension = "webm";
+      if (mimeType.includes("mp4")) extension = "mp4";
+      else if (mimeType.includes("ogg")) extension = "ogg";
+      else if (mimeType.includes("mpeg") || mimeType.includes("mp3"))
+        extension = "mp3";
+
       const formData = new FormData();
-      formData.append("file", audioBlob, `recording-${Date.now()}.mp3`);
+      formData.append(
+        "file",
+        audioBlob,
+        `recording-${Date.now()}.${extension}`,
+      );
 
       const result = await sendAnswerAudio(formData);
 
@@ -332,6 +359,9 @@ export default function Room() {
         duration,
         isFollowUp: !!followUpQuestion,
       };
+
+      // Save last transcription for follow-up display
+      setLastTranscription(result.transcription);
 
       setAnswers([...answers, newAnswer]);
       resetRecording();
@@ -373,8 +403,9 @@ export default function Room() {
           questionId: currentQuestion._id,
         });
 
-        // Clear follow-up setelah dijawab
+        // Clear follow-up dan last transcription setelah dijawab
         setFollowUpQuestion(null);
+        setLastTranscription(null);
         setIsWaitingAck(false);
       } else {
         // Generate acknowledgment response untuk pertanyaan biasa tanpa follow-up
@@ -391,11 +422,17 @@ export default function Room() {
           questionId: currentQuestion._id,
         });
 
+        // Clear last transcription for non-follow-up questions
+        setLastTranscription(null);
         setIsWaitingAck(false);
       }
     } catch (error) {
       console.error("Error submitting recording:", error);
-      alert("Gagal mengirim recording. Silakan coba lagi.");
+      showAlert(
+        "Error",
+        "Gagal mengirim recording. Silakan coba lagi.",
+        "error",
+      );
       setIsWaitingFollowUp(false);
       setIsWaitingAck(false);
       setShowCurrentQuestion(true);
@@ -455,20 +492,27 @@ export default function Room() {
       // Redirect ke halaman evaluate dengan interview ID
       window.location.href = `/interview/evaluate?id=${interviewId}`;
     } else {
-      alert("Gagal menyimpan interview. Silakan coba lagi.");
+      showAlert(
+        "Error",
+        "Gagal menyimpan interview. Silakan coba lagi.",
+        "error",
+      );
     }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <span className="loading loading-spinner loading-lg"></span>
+      <div className="flex items-center justify-center min-h-screen bg-[#F8F9FC]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-gray-600 font-medium">Memuat interview...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-[#F8F9FC]">
       <InterviewHeader
         title={
           showGreeting
@@ -476,6 +520,7 @@ export default function Room() {
             : questions[0]?.category?.title || interviewConfig?.categoryTitle
         }
         level={showGreeting ? greetingQuestion.level : questions[0]?.level}
+        tier={interviewConfig?.tier}
         currentIndex={currentQuestionIndex}
         total={questions.length}
         currentQuestion={activeQuestion}
@@ -483,33 +528,33 @@ export default function Room() {
         isGreeting={showGreeting}
       />
 
-      <ChatThread
-        answers={answers}
-        questions={questions}
-        currentQuestion={activeQuestion}
-        greetingQuestion={greetingQuestion}
-        followUpQuestion={followUpQuestion}
-        acknowledgment={acknowledgment}
-        interviewCompleted={interviewCompleted}
-        isWaitingFollowUp={isWaitingFollowUp}
-        isWaitingAck={isWaitingAck}
-        showCurrentQuestion={showCurrentQuestion}
-        showGreeting={showGreeting}
-        chatEndRef={chatEndRef as React.RefObject<HTMLDivElement>}
-      />
+      {/* Question Card - Single Question Display */}
+      {!interviewCompleted && (
+        <QuestionCard
+          question={activeQuestion}
+          followUpQuestion={followUpQuestion}
+          isWaitingFollowUp={isWaitingFollowUp}
+          isWaitingAck={isWaitingAck}
+          acknowledgmentText={acknowledgment?.text || null}
+          showQuestion={showCurrentQuestion}
+          isGreeting={showGreeting}
+          isAudioPlaying={isAudioPlaying}
+          lastTranscription={lastTranscription}
+        />
+      )}
 
+      {/* Completion Card */}
       {interviewCompleted && (
-        <div className="px-6 pb-24">
-          <div className="max-w-4xl mx-auto">
-            <CompletionCard
-              totalQuestions={questions.length}
-              onReset={resetInterview}
-              onViewEvaluation={handleViewEvaluation}
-            />
-          </div>
+        <div className="flex-1 flex items-center justify-center px-6 py-8">
+          <CompletionCard
+            totalQuestions={questions.length}
+            onReset={resetInterview}
+            onViewEvaluation={handleViewEvaluation}
+          />
         </div>
       )}
 
+      {/* Recording Controls */}
       {!interviewCompleted &&
         !isWaitingFollowUp &&
         !isWaitingAck &&
@@ -525,6 +570,37 @@ export default function Room() {
             onReRecord={handleReRecord}
           />
         )}
+
+      {/* Start Interview Modal - Required for browser autoplay policy */}
+      {showStartModal && !loading && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <Card className="max-w-md w-full p-8 shadow-2xl text-center">
+            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-200">
+              <Mic className="w-10 h-10 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">
+              Siap Memulai Interview?
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Klik tombol di bawah untuk memulai sesi interview Anda.
+              Pewawancara AI akan mulai berbicara.
+            </p>
+            <Button
+              onClick={() => {
+                setShowStartModal(false);
+                setHasUserInteracted(true);
+              }}
+              className="w-full h-14 bg-black hover:bg-gray-800 text-white font-semibold rounded-xl shadow-lg text-lg"
+            >
+              <Play className="w-5 h-5 mr-2" />
+              Mulai Interview
+            </Button>
+          </Card>
+        </div>
+      )}
+
+      {/* Custom Modal untuk mengganti browser alerts */}
+      <Modal />
     </div>
   );
 }

@@ -12,6 +12,24 @@ interface UseRecorderResult {
   getAudioBlob: () => Blob | null;
 }
 
+// Get the best supported audio MIME type
+function getSupportedMimeType(): string {
+  const types = [
+    "audio/webm;codecs=opus",
+    "audio/webm",
+    "audio/ogg;codecs=opus",
+    "audio/mp4",
+    "audio/mpeg",
+  ];
+
+  for (const type of types) {
+    if (MediaRecorder.isTypeSupported(type)) {
+      return type;
+    }
+  }
+  return "audio/webm"; // fallback
+}
+
 /**
  * Handles microphone recording, keeps track of duration, audio URL, and blob data.
  */
@@ -19,6 +37,7 @@ export function useRecorder(): UseRecorderResult {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const recordingStartRef = useRef<number | null>(null);
+  const mimeTypeRef = useRef<string>("audio/webm");
 
   const [isRecording, setIsRecording] = useState(false);
   const [audioURL, setAudioURL] = useState("");
@@ -34,7 +53,10 @@ export function useRecorder(): UseRecorderResult {
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      const mimeType = getSupportedMimeType();
+      mimeTypeRef.current = mimeType;
+
+      const mediaRecorder = new MediaRecorder(stream, { mimeType });
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
       recordingStartRef.current = Date.now();
@@ -48,7 +70,7 @@ export function useRecorder(): UseRecorderResult {
 
       mediaRecorder.onstop = () => {
         const audioBlob = new Blob(audioChunksRef.current, {
-          type: "audio/mp3",
+          type: mimeTypeRef.current,
         });
         const url = URL.createObjectURL(audioBlob);
         setAudioURL(url);
@@ -77,7 +99,7 @@ export function useRecorder(): UseRecorderResult {
 
   const getAudioBlob = () => {
     if (!audioChunksRef.current.length) return null;
-    return new Blob(audioChunksRef.current, { type: "audio/mp3" });
+    return new Blob(audioChunksRef.current, { type: mimeTypeRef.current });
   };
 
   return {

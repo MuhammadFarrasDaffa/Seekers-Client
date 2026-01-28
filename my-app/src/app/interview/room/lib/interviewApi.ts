@@ -9,7 +9,9 @@ export async function sendAnswerAudio(formData: FormData) {
     },
   });
   if (!response.ok) {
-    throw new Error("Gagal mengirim recording");
+    const errorData = await response.text();
+    console.error("Server error:", response.status, errorData);
+    throw new Error(`Gagal mengirim recording: ${response.status}`);
   }
   return response.json();
 }
