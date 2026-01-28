@@ -27,7 +27,7 @@ import {
   UploadCloud,
   FileText,
 } from "lucide-react";
-import type { ProfileFormData } from "@/types/index";
+import type { ProfileFormData, Experience, Education } from "@/types/index";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 
@@ -714,6 +714,24 @@ export default function ProfilePage() {
     name: "User",
     role: "Job Seeker",
   });
+
+  // Load user info dari profile saat component mount
+  useEffect(() => {
+    const loadUserInfo = async () => {
+      try {
+        const { profile } = await profileService.getProfile();
+        if (profile) {
+          setUserInfo({
+            name: profile.fullName || "User",
+            role: profile.title || "Job Seeker",
+          });
+        }
+      } catch (error) {
+        console.error("Failed to load user info:", error);
+      }
+    };
+    loadUserInfo();
+  }, []);
 
   // Update info sidebar saat form profile disave atau diload
   const updateSidebarInfo = (name: string, role: string) => {

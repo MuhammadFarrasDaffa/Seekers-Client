@@ -31,6 +31,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { TokenBalance } from "@/components/payment/TokenBalance";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -38,11 +39,27 @@ export default function Navbar() {
   const router = useRouter();
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [userName, setUserName] = React.useState("John Doe");
+  const [userEmail, setUserEmail] = React.useState("john.doe@example.com");
 
   // Deteksi scroll untuk efek glassmorphism
   React.useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
+
+    // Load user info dari localStorage
+    if (token) {
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          setUserName(user.fullName || user.name || "John Doe");
+          setUserEmail(user.email || "john.doe@example.com");
+        } catch (error) {
+          console.error("Failed to parse user data:", error);
+        }
+      }
+    }
 
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -131,60 +148,67 @@ export default function Navbar() {
         {/* PROFILE DROPDOWN */}
         <div className="flex items-center gap-2">
           {isLoggedIn ? (
-            // JIKA LOGIN: Tampilkan Profile Dropdown
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="relative h-9 w-9 rounded-full"
-                >
-                  <Avatar className="h-9 w-9 border border-gray-200">
-                    {/* Ganti src dengan foto user dari backend nanti */}
-                    <AvatarImage
-                      src="https://github.com/shadcn.png"
-                      alt="User"
-                    />
-                    <AvatarFallback>TX</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">John Doe</p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      john.doe@example.com
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <Link href="/profile">
+            // JIKA LOGIN: Tampilkan TokenBalance dan Profile Dropdown
+            <div className="flex items-center gap-3">
+              <TokenBalance />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="relative h-9 w-9 rounded-full"
+                  >
+                    <Avatar className="h-9 w-9 border border-gray-200">
+                      {/* Ganti src dengan foto user dari backend nanti */}
+                      <AvatarImage
+                        src="https://github.com/shadcn.png"
+                        alt="User"
+                      />
+                      <AvatarFallback>
+                        {userName.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        {userName}
+                      </p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {userEmail}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <Link href="/profile">
+                    <DropdownMenuItem className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href="/payment">
+                    <DropdownMenuItem className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Billing</span>
+                    </DropdownMenuItem>
+                  </Link>
                   <DropdownMenuItem className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
                   </DropdownMenuItem>
-                </Link>
-                <Link href="/payment">
-                  <DropdownMenuItem className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Billing</span>
-                  </DropdownMenuItem>
-                </Link>
-                <DropdownMenuItem className="cursor-pointer">
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                  <DropdownMenuSeparator />
 
-                <DropdownMenuItem
-                  className="text-red-600 cursor-pointer focus:text-red-600"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <DropdownMenuItem
+                    className="text-red-600 cursor-pointer focus:text-red-600"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           ) : (
             // JIKA BELUM LOGIN: Tampilkan Tombol Login & Register
             <div className="hidden md:flex gap-2">
