@@ -281,7 +281,7 @@ export default function CVCreatePage() {
                 <Button
                   onClick={handleDownloadPDF}
                   disabled={isDownloading || !htmlContent}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+                  className="bg-black hover:bg-blue-700 text-white gap-2"
                 >
                   {isDownloading ? (
                     <>
@@ -298,11 +298,11 @@ export default function CVCreatePage() {
           </div>
 
           {/* Toggle Use Profile Data */}
-          <Card className="p-4 mb-6 border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50">
+          <Card className="p-4 mb-6 border-blue-200 bg-gradient-to-r from-blue-50 to-blue-100">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                  <Database className="w-5 h-5 text-emerald-600" />
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Database className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">
@@ -343,7 +343,7 @@ export default function CVCreatePage() {
 
           <div className="flex flex-col lg:flex-row gap-6">
             {/* LEFT: Form */}
-            <div className={`${showPreview ? "lg:w-1/2" : "w-full"} space-y-6`}>
+            <div className={`${showPreview ? "lg:w-1/2" : "w-full"}`}>
               <form
                 onSubmit={handleSubmit(handleSaveAndPreview)}
                 className="space-y-6"
@@ -756,11 +756,11 @@ export default function CVCreatePage() {
                 </Card>
 
                 {/* SUBMIT BUTTON */}
-                <div className="flex gap-3">
+                <div className="flex gap-3 pt-2 pb-6">
                   <Button
                     type="submit"
                     disabled={isSavingProfile || isLoading}
-                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white h-12 font-semibold"
+                    className="flex-1 bg-blue-700 hover:bg-blue-800 text-white h-12 font-semibold shadow-md"
                   >
                     {isSavingProfile || isLoading ? (
                       <>
@@ -792,71 +792,77 @@ export default function CVCreatePage() {
 
             {/* RIGHT: Preview */}
             {showPreview && (
-              <div className="lg:w-1/2 lg:sticky lg:top-24 lg:self-start">
-                <Card className="border border-gray-200 shadow-sm bg-white rounded-xl overflow-hidden">
-                  <div className="bg-emerald-600 text-white text-xs py-2 px-4 font-medium flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <Eye className="w-3 h-3" /> LIVE PREVIEW
-                    </span>
-                    <span className="text-emerald-200">Format: A4 Modern</span>
-                  </div>
+              <div className="lg:w-1/2">
+                <div className="lg:sticky lg:top-20">
+                  <Card className="border border-gray-200 shadow-sm bg-white rounded-xl overflow-hidden">
+                    <div className="bg-emerald-600 text-white text-xs py-2 px-4 font-medium flex items-center justify-between">
+                      <span className="flex items-center gap-2">
+                        <Eye className="w-3 h-3" /> LIVE PREVIEW
+                      </span>
+                      <span className="text-emerald-200">
+                        Format: A4 Modern
+                      </span>
+                    </div>
 
-                  <div className="p-4 max-h-[calc(100vh-200px)] overflow-y-auto">
-                    {/* Loading State */}
-                    {isLoading && (
-                      <div className="h-[600px] flex flex-col items-center justify-center">
-                        <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mb-3" />
-                        <p className="text-gray-500 font-medium">
-                          Menyiapkan preview...
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Error State */}
-                    {error && !isLoading && (
-                      <div className="h-[400px] flex flex-col items-center justify-center text-center p-8">
-                        <FileText className="w-12 h-12 text-red-300 mb-3" />
-                        <h3 className="font-bold text-red-800">
-                          Gagal Memuat Preview
-                        </h3>
-                        <p className="text-red-600 text-sm mb-4">{error}</p>
-                        <Button variant="outline" onClick={loadPreview}>
-                          Coba Lagi
-                        </Button>
-                      </div>
-                    )}
-
-                    {/* Empty State */}
-                    {!htmlContent && !isLoading && !error && (
-                      <div className="h-[500px] flex flex-col items-center justify-center text-center p-8 border border-dashed border-gray-300 rounded-lg">
-                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                          <FileText className="w-8 h-8 text-gray-300" />
+                    <div className="p-4 max-h-[70vh] overflow-y-auto">
+                      {/* Loading State */}
+                      {isLoading && (
+                        <div className="min-h-[400px] flex flex-col items-center justify-center">
+                          <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mb-3" />
+                          <p className="text-gray-500 font-medium">
+                            Menyiapkan preview...
+                          </p>
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900">
-                          Belum ada Preview
-                        </h3>
-                        <p className="text-gray-500 max-w-xs mx-auto mb-4 text-sm">
-                          Isi form di sebelah kiri lalu klik "Simpan & Preview
-                          CV" untuk melihat hasil.
-                        </p>
-                      </div>
-                    )}
+                      )}
 
-                    {/* Actual Preview */}
-                    {htmlContent && !isLoading && (
-                      <div
-                        className="cv-preview-content bg-white text-black text-sm leading-normal border border-gray-200 shadow-sm"
-                        dangerouslySetInnerHTML={{ __html: htmlContent }}
-                        style={{
-                          fontFamily: "Arial, sans-serif",
-                          color: "#000000",
-                          padding: "1cm",
-                          minHeight: "29.7cm",
-                        }}
-                      />
-                    )}
-                  </div>
-                </Card>
+                      {/* Error State */}
+                      {error && !isLoading && (
+                        <div className="min-h-[300px] flex flex-col items-center justify-center text-center p-8">
+                          <FileText className="w-12 h-12 text-red-300 mb-3" />
+                          <h3 className="font-bold text-red-800">
+                            Gagal Memuat Preview
+                          </h3>
+                          <p className="text-red-600 text-sm mb-4">{error}</p>
+                          <Button variant="outline" onClick={loadPreview}>
+                            Coba Lagi
+                          </Button>
+                        </div>
+                      )}
+
+                      {/* Empty State */}
+                      {!htmlContent && !isLoading && !error && (
+                        <div className="min-h-[400px] flex flex-col items-center justify-center text-center p-8 border border-dashed border-gray-300 rounded-lg">
+                          <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                            <FileText className="w-8 h-8 text-gray-300" />
+                          </div>
+                          <h3 className="text-lg font-bold text-gray-900">
+                            Belum ada Preview
+                          </h3>
+                          <p className="text-gray-500 max-w-xs mx-auto mb-4 text-sm">
+                            Isi form di sebelah kiri lalu klik "Simpan & Preview
+                            CV" untuk melihat hasil.
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Actual Preview - Using iframe to isolate CSS */}
+                      {htmlContent && !isLoading && !error && (
+                        <div className="cv-preview-wrapper">
+                          <iframe
+                            title="CV Preview"
+                            srcDoc={htmlContent}
+                            className="w-full border border-gray-200 shadow-sm rounded-lg bg-white"
+                            style={{
+                              minHeight: "700px",
+                              height: "100%",
+                            }}
+                            sandbox="allow-same-origin"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                </div>
               </div>
             )}
           </div>

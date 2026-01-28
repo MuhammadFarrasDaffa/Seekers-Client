@@ -22,9 +22,7 @@ export const pdfService = {
 
   async generatePDF(template: string = "modern"): Promise<Blob> {
     const token =
-      typeof window !== "undefined"
-        ? localStorage.getItem("access_token")
-        : null;
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
     const response = await fetch(`${API_URL}/pdf/generate`, {
       method: "POST",
