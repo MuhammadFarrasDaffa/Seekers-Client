@@ -12,6 +12,7 @@ import {
   Mic,
   User,
   Settings,
+  CreditCard,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -74,7 +75,7 @@ export default function Navbar() {
   ];
 
   const privateNavItems = [
-    { name: "CV Generator", href: "/preview", icon: FileText },
+    { name: "CV Generator", href: "/cv-generator", icon: FileText },
     { name: "AI Interview", href: "/interview", icon: Mic },
   ];
 
@@ -189,7 +190,7 @@ export default function Navbar() {
                   </Link>
                   <Link href="/payment">
                     <DropdownMenuItem className="cursor-pointer">
-                      <User className="mr-2 h-4 w-4" />
+                      <CreditCard className="mr-2 h-4 w-4" />
                       <span>Billing</span>
                     </DropdownMenuItem>
                   </Link>

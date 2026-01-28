@@ -38,8 +38,7 @@ declare global {
   }
 }
 
-const GOOGLE_CLIENT_ID =
-  "5991558653-orc6rqp348t9f2qp57k55jkk2it5cqqa.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
 
 export default function RegisterPage() {
   const router = useRouter();

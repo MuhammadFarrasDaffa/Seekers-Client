@@ -29,7 +29,7 @@ export function TokenBalance() {
 
   if (loading) {
     return (
-      <Badge variant="outline" className="gap-2">
+      <Badge variant="outline" className="gap-2 rounded-lg">
         <Coins className="h-4 w-4" />
         Loading...
       </Badge>
@@ -37,10 +37,10 @@ export function TokenBalance() {
   }
 
   return (
-    <Badge 
-      variant={balance > 0 ? "default" : "destructive"} 
-      className="gap-2 cursor-pointer hover:opacity-80"
-      onClick={() => window.location.href = "/payment"}
+    <Badge
+      variant={balance > 0 ? "default" : "destructive"}
+      className="gap-2 cursor-pointer hover:opacity-80 rounded-lg"
+      onClick={() => (window.location.href = "/payment")}
       title="Click to buy more tokens"
     >
       <Coins className="h-4 w-4" />
