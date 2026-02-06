@@ -21,7 +21,6 @@ interface CategoryCardProps {
 }
 
 export default function CategoryCard({
-  id,
   title,
   description,
   imgUrl,

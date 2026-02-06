@@ -409,7 +409,6 @@ export default function CategoryManagement() {
                 {categories.map((category) => (
                   <CategoryCard
                     key={category._id}
-                    id={category._id}
                     title={category.title}
                     description={category.description}
                     imgUrl={category.imgUrl}

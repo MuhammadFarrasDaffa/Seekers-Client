@@ -5,7 +5,7 @@ import {
   Answer,
   FollowUpQuestion,
   Question,
-} from "@/app/types";
+} from "@/types";
 import { RefObject } from "react";
 
 interface ChatThreadProps {

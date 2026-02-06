@@ -1,6 +1,6 @@
 "use client";
 
-import { InterviewEvaluation } from "../types";
+import { InterviewEvaluation } from "@/types";
 
 interface OverallCardProps {
   evaluation: InterviewEvaluation;

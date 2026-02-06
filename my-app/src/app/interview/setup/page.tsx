@@ -54,7 +54,7 @@ export default function InterviewSetupPage() {
         setLoadingCategories(true);
         // Note: Pastikan URL ini sesuai dengan env di production nanti
         const response = await fetch(
-          "http://localhost:3000/categories/published?published=true",
+          `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/categories/published?published=true`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
@@ -79,11 +79,14 @@ export default function InterviewSetupPage() {
     async function fetchTiers() {
       try {
         setLoadingTiers(true);
-        const response = await fetch("http://localhost:3000/tiers", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/tiers`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+            },
           },
-        });
+        );
         if (!response.ok) throw new Error("Failed to fetch tiers");
         const data = await response.json();
         setTiers(data.tiers || []);
@@ -140,14 +143,17 @@ export default function InterviewSetupPage() {
     setShowConfirmModal(false);
 
     try {
-      const response = await fetch("http://localhost:3000/interviews/start", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/interviews/start`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+          },
+          body: JSON.stringify(config),
         },
-        body: JSON.stringify(config),
-      });
+      );
 
       if (!response.ok) throw new Error(`Server error: ${response.status}`);
       const data = await response.json();
@@ -194,7 +200,7 @@ export default function InterviewSetupPage() {
           level: selectedLevel,
         });
         const res = await fetch(
-          `http://localhost:3000/questions/count?${params.toString()}`,
+          `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/questions/count?${params.toString()}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
@@ -278,7 +284,15 @@ export default function InterviewSetupPage() {
                           : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
                       }`}
                     >
-                      <div className="text-2xl mb-2">{category.icon}</div>
+                      <div className="text-2xl mb-2">
+                        {category.imgUrl && (
+                          <img
+                            src={category.imgUrl}
+                            alt={category.title}
+                            className="w-8 h-8 object-cover rounded"
+                          />
+                        )}
+                      </div>
                       <div className="font-semibold text-gray-900">
                         {category.title}
                       </div>

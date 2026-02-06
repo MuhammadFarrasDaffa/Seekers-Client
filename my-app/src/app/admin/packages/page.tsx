@@ -413,7 +413,6 @@ export default function PackageManagement() {
                 {packages.map((pkg) => (
                   <PackageCard
                     key={pkg._id}
-                    id={pkg._id}
                     name={pkg.name}
                     type={pkg.type}
                     tokens={pkg.tokens}

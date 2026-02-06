@@ -24,7 +24,6 @@ interface PackageCardProps {
 }
 
 export default function PackageCard({
-  id,
   name,
   type,
   tokens,

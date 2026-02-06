@@ -1,7 +1,7 @@
 import React from "react";
 
 interface StarBorderProps {
-  as?: React.ElementType;
+  as?: string;
   className?: string;
   color?: string;
   speed?: string;
@@ -10,13 +10,14 @@ interface StarBorderProps {
 }
 
 const StarBorder: React.FC<StarBorderProps> = ({
-  as: Component = "button",
+  as = "button",
   className = "",
   color = "white",
   speed = "6s",
   children,
   ...props
 }) => {
+  const Component = as as any;
   return (
     <Component
       className={`relative inline-block py-[1px] overflow-hidden rounded-[20px] ${className}`}

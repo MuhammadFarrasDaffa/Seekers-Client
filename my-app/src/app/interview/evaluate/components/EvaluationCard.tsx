@@ -1,6 +1,6 @@
 "use client";
 
-import { EvaluationScore } from "../types";
+import { EvaluationScore } from "@/types";
 
 interface EvaluationCardProps {
   data: EvaluationScore;

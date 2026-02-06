@@ -16,7 +16,6 @@ interface QuestionCardProps {
 }
 
 export default function QuestionCard({
-  id,
   content,
   categoryTitle,
   level,

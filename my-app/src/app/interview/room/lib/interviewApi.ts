@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:3000/interviews";
+const BASE_URL = `${process.env.NEXT_PUBLIC_BASE_URL}/interviews`;
 
 export async function sendAnswerAudio(formData: FormData) {
   const response = await fetch(`${BASE_URL}/answer`, {

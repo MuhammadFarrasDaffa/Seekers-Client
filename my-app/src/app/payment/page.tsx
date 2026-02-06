@@ -58,9 +58,12 @@ export default function PaymentPage() {
   const loadPackages = async () => {
     try {
       // Kita tetap butuh token untuk auth, tapi tidak perlu fetch balance user
-      const response = await fetch("http://localhost:3000/packages", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/packages`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        },
+      );
       if (!response.ok) throw new Error("Failed to fetch packages");
       const data = await response.json();
       setPackages(data.packages || []);

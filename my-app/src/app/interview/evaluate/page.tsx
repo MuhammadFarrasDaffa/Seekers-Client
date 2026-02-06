@@ -51,7 +51,7 @@ export default function InterviewEvaluationPage() {
       setError(null);
 
       const response = await fetch(
-        `http://localhost:3000/interviews/${interviewId}/evaluate`,
+        `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/interviews/${interviewId}/evaluate`,
         {
           method: "POST",
           headers: {

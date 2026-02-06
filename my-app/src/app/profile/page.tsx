@@ -1018,9 +1018,12 @@ const HistorySection = () => {
   const fetchInterviewHistory = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:3000/interviews/history", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/interviews/history`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        },
+      );
       if (!response.ok) throw new Error("Failed to fetch interview history");
       const data = await response.json();
       setInterviews(data.interviews);

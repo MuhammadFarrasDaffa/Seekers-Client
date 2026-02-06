@@ -58,7 +58,7 @@ export default function QuestionsManagement() {
         setQuestions(
           data.questions.map((q: AdminQuestion) => ({
             ...q,
-            categoryTitle: q.categoryId?.title || "Unknown Category",
+            categoryTitle: q.categoryTitle || "Unknown Category",
           })),
         );
       }
@@ -417,7 +417,6 @@ export default function QuestionsManagement() {
                 {questions.map((question) => (
                   <QuestionCard
                     key={question._id}
-                    id={question._id}
                     content={question.content}
                     categoryTitle={question.categoryTitle || "Unknown Category"}
                     level={question.level}

@@ -19,8 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { AdminCategory } from "@/types";
 
-const SERVER_URL =
-  process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+const SERVER_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 const API_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
 interface BulkQuestion {
@@ -178,7 +177,7 @@ export default function BulkQuestionsPage() {
         SERVER_URL,
         endpoint: `${SERVER_URL}/questions/bulk`,
         token: token ? "✅ Token exists" : "❌ No token",
-        payload: { categoryId, level, type, count }
+        payload: { categoryId, level, type, count },
       });
 
       const res = await fetch(`${SERVER_URL}/questions/bulk`, {
@@ -198,13 +197,15 @@ export default function BulkQuestionsPage() {
       console.log("📡 Response:", {
         status: res.status,
         statusText: res.statusText,
-        ok: res.ok
+        ok: res.ok,
       });
 
       if (!res.ok) {
         const errorText = await res.text();
         console.error("❌ Response Error:", errorText);
-        throw new Error(`Failed to generate questions: ${res.status} ${res.statusText}`);
+        throw new Error(
+          `Failed to generate questions: ${res.status} ${res.statusText}`,
+        );
       }
 
       const data = await res.json();
@@ -227,16 +228,17 @@ export default function BulkQuestionsPage() {
       console.error("🚨 Generate Bulk Error:", {
         error: err,
         message: err instanceof Error ? err.message : "Unknown error",
-        name: err instanceof Error ? err.name : "N/A"
+        name: err instanceof Error ? err.name : "N/A",
       });
-      
-      const errorMessage = err instanceof Error ? err.message : "Failed to generate questions";
+
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to generate questions";
       setError(errorMessage);
-      
+
       Swal.fire({
         icon: "error",
-        title: "Generation Error", 
-        text: errorMessage.includes("Failed to fetch") 
+        title: "Generation Error",
+        text: errorMessage.includes("Failed to fetch")
           ? "Cannot connect to server. Please check if server is running on port 3000."
           : errorMessage,
         confirmButtonColor: "#3b82f6",
