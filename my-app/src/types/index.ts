@@ -133,6 +133,7 @@ export interface Skill {
   _id?: string;
   name: string;
   level?: string;
+  category?: "hardSkill" | "softSkill" | "tool";
 }
 
 export interface Certification {
