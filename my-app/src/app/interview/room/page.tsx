@@ -112,22 +112,10 @@ export default function Room() {
           // Optional: Clear data setelah digunakan agar tidak tertinggal
           // sessionStorage.removeItem('interviewData');
         } else {
-          // Fallback: Jika tidak ada data di sessionStorage, redirect ke selection page
-          console.warn("No interview data found, redirecting to selection...");
-          // window.location.href = '/interview/selection';
-
-          // Atau bisa fetch ulang dari API (tidak recommended)
-          const response = await fetch(
-            "http://localhost:3000/interviews/start",
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-            },
-          );
-          const data: Question[] = await response.json();
-          setQuestions(data);
-          setShowGreeting(false);
+          // Fallback: Jika tidak ada data di sessionStorage, redirect ke setup page
+          console.warn("No interview data found, redirecting to setup...");
+          window.location.href = "/interview/setup";
+          return;
         }
       } catch (error) {
         console.log("🚀 ~ fetch ~ error:", error);
@@ -211,7 +199,14 @@ export default function Room() {
         audioRef.current.src = "";
       }
 
+      // Use simple Audio constructor with URL directly
       const audio = new Audio(url);
+
+      // Set crossOrigin for external URLs (Cloudinary), not needed for blob URLs
+      if (url.startsWith("http") && !url.startsWith("blob:")) {
+        audio.crossOrigin = "anonymous";
+      }
+
       activeAudio = audio;
       audioRef.current = audio;
 
@@ -237,8 +232,26 @@ export default function Room() {
 
     // LOGIK PEMILIHAN AUDIO
     if (acknowledgment && !interviewCompleted) {
-      const audioBlob = base64ToBlob(acknowledgment.audioBase64, "audio/mp3");
-      playAudio(URL.createObjectURL(audioBlob), () => {
+      // VOICE ENABLED: Play audio for acknowledgment response
+      if (acknowledgment.audioBase64) {
+        const audioBlob = base64ToBlob(acknowledgment.audioBase64, "audio/mp3");
+        playAudio(URL.createObjectURL(audioBlob), () => {
+          setAnswers((prev) => {
+            const updated = [...prev];
+            if (updated.length > 0)
+              updated[updated.length - 1].acknowledgment = acknowledgment.text;
+            return updated;
+          });
+          setAcknowledgment(null);
+          setShowCurrentQuestion(true);
+          if (currentQuestionIndex < questions.length - 1) {
+            setCurrentQuestionIndex((prev) => prev + 1);
+          } else {
+            setInterviewCompleted(true);
+          }
+        });
+      } else {
+        // Fallback if no audio provided
         setTimeout(() => {
           setAnswers((prev) => {
             const updated = [...prev];
@@ -253,11 +266,22 @@ export default function Room() {
           } else {
             setInterviewCompleted(true);
           }
-        }, 500);
-      });
+        }, 1500);
+      }
     } else if (followUpQuestion && !interviewCompleted) {
-      const audioBlob = base64ToBlob(followUpQuestion.audioBase64, "audio/mp3");
-      playAudio(URL.createObjectURL(audioBlob));
+      // VOICE ENABLED: Play audio for follow-up response
+      if (followUpQuestion.audioBase64) {
+        const audioBlob = base64ToBlob(
+          followUpQuestion.audioBase64,
+          "audio/mp3",
+        );
+        playAudio(URL.createObjectURL(audioBlob));
+      } else {
+        console.log(
+          "Follow-up question displayed (no audio available):",
+          followUpQuestion.text,
+        );
+      }
     } else if (!interviewCompleted && activeQuestion?.audioUrl) {
       // Memutar Greeting atau Pertanyaan Reguler
       playAudio(activeQuestion.audioUrl, () => {

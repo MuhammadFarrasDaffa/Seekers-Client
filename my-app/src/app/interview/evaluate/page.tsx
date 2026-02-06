@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { OverallCard } from "./components/OverallCard";
@@ -31,9 +31,11 @@ export default function InterviewEvaluationPage() {
     null,
   );
   const [error, setError] = useState<string | null>(null);
+  const hasEvaluatedRef = useRef(false); // Prevent double evaluation
 
   useEffect(() => {
-    if (interviewId) {
+    if (interviewId && !hasEvaluatedRef.current) {
+      hasEvaluatedRef.current = true;
       evaluateInterview();
     }
   }, [interviewId]);

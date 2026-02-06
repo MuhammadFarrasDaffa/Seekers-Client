@@ -13,6 +13,12 @@ import {
   User,
   Settings,
   CreditCard,
+  Shield,
+  LayoutGrid,
+  HelpCircle,
+  Layers,
+  Package,
+  PlusCircle,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -42,6 +48,8 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [userName, setUserName] = React.useState("John Doe");
   const [userEmail, setUserEmail] = React.useState("john.doe@example.com");
+  const [userRole, setUserRole] = React.useState<string>("");
+  const [isAdmin, setIsAdmin] = React.useState(false);
 
   // Deteksi scroll untuk efek glassmorphism
   React.useEffect(() => {
@@ -56,6 +64,8 @@ export default function Navbar() {
           const user = JSON.parse(userStr);
           setUserName(user.fullName || user.name || "John Doe");
           setUserEmail(user.email || "john.doe@example.com");
+          setUserRole(user.role || "");
+          setIsAdmin(user.role === "admin");
         } catch (error) {
           console.error("Failed to parse user data:", error);
         }
@@ -79,7 +89,19 @@ export default function Navbar() {
     { name: "AI Interview", href: "/interview", icon: Mic },
   ];
 
-  // Gabungkan menu jika login
+  const adminNavItems = [
+    { name: "Categories", href: "/admin/categories", icon: LayoutGrid },
+    { name: "Questions", href: "/admin/questions", icon: HelpCircle },
+    { name: "Tiers", href: "/admin/tiers", icon: Layers },
+    { name: "Packages", href: "/admin/packages", icon: Package },
+    {
+      name: "Create Questions",
+      href: "/admin/create-questions",
+      icon: PlusCircle,
+    },
+  ];
+
+  // Gabungkan menu jika login (exclude admin from main nav)
   const navItems = isLoggedIn
     ? [...publicNavItems, ...privateNavItems]
     : publicNavItems;
@@ -198,6 +220,23 @@ export default function Navbar() {
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </DropdownMenuItem>
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuLabel>Admin Panel</DropdownMenuLabel>
+                      {adminNavItems.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <Link href={item.href} key={item.href}>
+                            <DropdownMenuItem className="cursor-pointer">
+                              <Icon className="mr-2 h-4 w-4" />
+                              <span>{item.name}</span>
+                            </DropdownMenuItem>
+                          </Link>
+                        );
+                      })}
+                    </>
+                  )}
                   <DropdownMenuSeparator />
 
                   <DropdownMenuItem
@@ -257,6 +296,34 @@ export default function Navbar() {
                       </Link>
                     );
                   })}
+
+                  {isAdmin && isLoggedIn && (
+                    <>
+                      <div className="border-t pt-4 mt-4">
+                        <p className="text-sm font-semibold text-gray-900 px-4 mb-2">
+                          Admin Panel
+                        </p>
+                        {adminNavItems.map((item) => {
+                          const Icon = item.icon;
+                          const isActive = pathname === item.href;
+                          return (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                                isActive
+                                  ? "bg-black text-white"
+                                  : "text-gray-600 hover:bg-gray-100"
+                              }`}
+                            >
+                              <Icon className="w-5 h-5" />
+                              {item.name}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
                 </div>
               </SheetContent>
             </Sheet>

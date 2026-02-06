@@ -54,7 +54,7 @@ export default function InterviewSetupPage() {
         setLoadingCategories(true);
         // Note: Pastikan URL ini sesuai dengan env di production nanti
         const response = await fetch(
-          "http://localhost:3000/questions/categories",
+          "http://localhost:3000/categories/published?published=true",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
@@ -63,7 +63,9 @@ export default function InterviewSetupPage() {
         );
         if (!response.ok) throw new Error("Failed to fetch categories");
         const data = await response.json();
-        setCategories((data || []).filter((c: Category) => c.published));
+        setCategories(
+          (data.categories || []).filter((c: Category) => c.published),
+        );
       } catch (error) {
         console.error("Error fetching categories:", error);
       } finally {

@@ -39,13 +39,29 @@ export interface Category {
   _id: string;
   title: string;
   description: string;
-  icon: string;
+  imgUrl: string; // Updated from icon to imgUrl to match migrated structure
   level?: {
     junior: boolean;
     middle: boolean;
     senior: boolean;
   };
   published?: boolean;
+}
+
+// Admin-specific Category interface
+export interface AdminCategory {
+  _id: string;
+  title: string;
+  description: string;
+  imgUrl: string;
+  level: {
+    junior: boolean;
+    middle: boolean;
+    senior: boolean;
+  };
+  published: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface InterviewConfig {
@@ -209,4 +225,42 @@ export interface User {
   email: string;
   role: string;
   token: number;
+}
+
+// Admin-specific types for CRUD operations
+export interface AdminPackage {
+  _id: string;
+  name: string;
+  type: string;
+  tokens: number;
+  price: number;
+  description: string;
+  features: string[];
+  popular: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AdminTier {
+  _id: string;
+  title: string;
+  price: number;
+  benefits: string[];
+  quota: number;
+  description: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AdminQuestion {
+  _id: string;
+  categoryId: string;
+  level: string;
+  type: string;
+  content: string;
+  followUp: boolean;
+  audioUrl: string;
+  createdAt?: string;
+  updatedAt?: string;
+  categoryTitle?: string; // For populated category data
 }
